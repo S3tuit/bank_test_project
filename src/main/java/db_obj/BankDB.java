@@ -3,6 +3,8 @@ package db_obj;
 import java.math.BigDecimal;
 import java.sql.*;
 
+import static org.postgresql.jdbc.PgConnection.ReadOnlyBehavior.transaction;
+
 public class BankDB {
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/bank_test";
     private static final String DB_USER = "postgres";
@@ -74,6 +76,45 @@ public class BankDB {
             e.printStackTrace();
         }
         // username not present
+        return false;
+    }
+
+    public static boolean addTransactionToDB(Transaction transaction) {
+        try(Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+
+            PreparedStatement ps = con.prepareStatement(
+                    "INSERT INTO bank_transaction(user_id, transaction_amount, transaction_type, transaction_date)" +
+                    "VALUES (?, ?, ?, CURRENT_TIMESTAMP);"
+            );
+            ps.setInt(1, transaction.getUserId());
+            ps.setBigDecimal(2, transaction.getTransactionAmount());
+            ps.setString(3, transaction.getTransactionType());
+
+            ps.executeUpdate();
+            return true;
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean updateCurrentBalance(User user) {
+        try(Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE bank_user SET current_balance = ? WHERE id = ?;"
+            );
+
+            ps.setBigDecimal(1, user.getCurrentBalance());
+            ps.setInt(2, user.getId());
+
+            ps.executeUpdate();
+            return true;
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 }
