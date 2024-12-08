@@ -106,6 +106,10 @@ public class PeppaBankGui extends BaseFrame implements ActionListener {
             }
 
             peppaBankDialog.setVisible(true);
+        } else if (buttonPressed.equalsIgnoreCase("Past Transaction")) {
+            peppaBankDialog.showPastTransactions();
         }
+
+        peppaBankDialog.setVisible(true);
     }
 }

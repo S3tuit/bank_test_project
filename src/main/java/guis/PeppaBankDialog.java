@@ -1,5 +1,6 @@
 package guis;
 
+import db_obj.BankDB;
 import db_obj.Transaction;
 import db_obj.User;
 
@@ -8,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 public class PeppaBankDialog extends JDialog implements ActionListener {
     private User user;
@@ -15,6 +17,8 @@ public class PeppaBankDialog extends JDialog implements ActionListener {
     private JLabel balanceLabel, enterAmountLabel, enterUserLabel;
     private JTextField enterAmountTextField, enterUserField;
     private JButton actionButton;
+    private JPanel pastTransactionPanel;
+    private ArrayList<Transaction> pastTransactions;
 
     public PeppaBankDialog(PeppaBankGui peppaBankGui, User user) {
         setSize(400, 400);
@@ -52,6 +56,7 @@ public class PeppaBankDialog extends JDialog implements ActionListener {
         actionButton = new JButton(actionType);
         actionButton.setBounds(15, 300, getWidth()-50, 40);
         actionButton.setFont(new Font("Dialog", Font.BOLD, 20));
+        actionButton.addActionListener(this);
         add(actionButton);
     }
 
@@ -84,7 +89,35 @@ public class PeppaBankDialog extends JDialog implements ActionListener {
         }
 
         // Update database
+        if(BankDB.addTransactionToDB(transaction) && BankDB.updateCurrentBalance(user)){
+            JOptionPane.showMessageDialog(this, transactionType + " Successfully!");
 
+            // reset fields
+            updateFields();
+        }else{
+            JOptionPane.showMessageDialog(this, transactionType + " Failed :(");
+        }
+    }
+
+    private void updateFields() {
+        enterAmountTextField.setText("");
+
+        if(enterUserField != null) {
+            enterUserField.setText("");
+        }
+
+        balanceLabel.setText("Balance: $" + user.getCurrentBalance());
+        peppaBankGui.getCurrentBalanceField().setText("$" + user.getCurrentBalance());
+    }
+
+    private void handleTransfer(User user, String transferredUser, double transferAmount) {
+        // attempt transfer
+        if(BankDB.transfer(user, transferredUser, transferAmount)) {
+            JOptionPane.showMessageDialog(this, "Transfer Success!");
+            updateFields();
+        }else{
+            JOptionPane.showMessageDialog(this, "Transfer Failed");
+        }
     }
 
     @Override
@@ -92,6 +125,59 @@ public class PeppaBankDialog extends JDialog implements ActionListener {
         String buttonPressed = e.getActionCommand();
         double amountValue = Double.parseDouble(enterAmountTextField.getText());
 
-        if(buttonPressed.equalsIgnoreCase("Deposit")){}
+        if(buttonPressed.equalsIgnoreCase("Deposit")){
+            handleTransaction(buttonPressed, amountValue);
+        }else{
+            // withdraw or transfer
+
+            // -1 = entered amout is greater, 0 is equal, 1 is lower
+            if(user.getCurrentBalance().compareTo(BigDecimal.valueOf(amountValue)) < 0){
+                JOptionPane.showMessageDialog(this, "Error: entered amout is greater than current balance");
+                return;
+            }
+
+            if(buttonPressed.equalsIgnoreCase("Withdraw")){
+                handleTransaction(buttonPressed, amountValue);
+            }else{
+                String transferredUser = enterUserField.getText();
+                handleTransfer(user, transferredUser, amountValue);
+            }
+        }
+    }
+
+    public void showPastTransactions() {
+        pastTransactionPanel = new JPanel();
+        pastTransactionPanel.setLayout(new BoxLayout(pastTransactionPanel, BoxLayout.Y_AXIS));
+
+        JScrollPane scrollPane = new JScrollPane(pastTransactionPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBounds(0, 20, getWidth() - 15, getHeight() - 80);
+
+        pastTransactions = BankDB.getPastTransactions(user);
+
+        for(Transaction pastTrans : pastTransactions){
+            JPanel pastTransactionContainer = new JPanel();
+            pastTransactionContainer.setLayout(new BorderLayout());
+
+            JLabel transactionTypeLabel = new JLabel(pastTrans.getTransactionType());
+            transactionTypeLabel.setFont(new Font("Dialog", Font.BOLD, 20));
+
+            JLabel transactionAmountLabel = new JLabel(pastTrans.getTransactionAmount().toString());
+            transactionAmountLabel.setFont(new Font("Dialog", Font.BOLD, 20));
+
+            JLabel transactionDateLabel = new JLabel(pastTrans.getTransactionDate().toString());
+            transactionDateLabel.setFont(new Font("Dialog", Font.BOLD, 20));
+
+            pastTransactionContainer.add(transactionTypeLabel, BorderLayout.WEST);
+            pastTransactionContainer.add(transactionAmountLabel, BorderLayout.EAST);
+            pastTransactionContainer.add(transactionDateLabel, BorderLayout.NORTH);
+
+            pastTransactionContainer.setBackground(Color.WHITE);
+            pastTransactionContainer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            pastTransactionPanel.add(pastTransactionContainer);
+
+        }
+
+        add(scrollPane);
     }
 }
