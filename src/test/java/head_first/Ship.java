@@ -10,9 +10,10 @@ public class Ship {
 
     public Ship(int gridLength, int shipLength) {
         this.shipLength = shipLength;
-        int startPosition = (int) Math.round(Math.random() * (gridLength - this.shipLength));
-        location = new int[shipLength];
+        // the gridLength + 1 is there because Math.random gives a num from 0 to 0.999...
+        int startPosition = (int) (Math.random() * ((gridLength + 1) - this.shipLength));
 
+        location = new int[shipLength];
         for (int i = 0; i < this.shipLength; i++) {
             location[i] = startPosition + i;
         }
