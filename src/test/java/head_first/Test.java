@@ -15,7 +15,7 @@ public class Test {
             }
         }
 
-        do{} while(gameGrid.guess() != "Dead");
+        gameGrid.startGame();
 
 
     }

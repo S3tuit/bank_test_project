@@ -6,11 +6,17 @@ public class GameGrid {
 
     int gridLength;
     Ship[] grid;
-    Scanner scan = new Scanner(System.in);
+
+    // false = the user never guessed it before, true otherwise
+    boolean[] gridHistory;
+    int guessesNeeded = 0;
+    GameHelper gameHelper;
 
     public GameGrid(int gridLength) {
         this.gridLength = gridLength;
         grid = new Ship[gridLength];
+        gameHelper = new GameHelper(gridLength);
+        gridHistory = new boolean[gridLength];
     }
 
     public void createShips(){
@@ -24,15 +30,13 @@ public class GameGrid {
     public String guess() {
         String result = "Miss";
         boolean dead = false;
+        int guess = gameHelper.getUserGuess();
 
-        System.out.println("Enter your guess: ");
-        String userGuess = scan.nextLine();
-        while (!this.validateGuess(userGuess)) {
-            System.out.println("Enter your guess: ");
-            userGuess = scan.nextLine();
+        if (this.gridHistory[guess]) {
+            System.out.println("You already guessed that position...");
+            return "Repeated";
         }
 
-        int guess = Integer.parseInt(userGuess);
         if (grid[guess] != null) {
             grid[guess].increaseNumOfHits();
             dead = grid[guess].isDead();
@@ -42,22 +46,27 @@ public class GameGrid {
 
         if (dead) {result = "Dead";}
 
+        this.increaseGuessesNeeded();
+        this.gridHistory[guess] = true;
         System.out.println(result);
         return result;
 
     }
 
-    public boolean validateGuess(String userGuess){
-        try {
-            int guess = Integer.parseInt(userGuess);
-            return true;
-        }
-        catch (NumberFormatException e) {
-            System.out.println("Input is not a number");
-            return false;
-        }
+
+    private void increaseGuessesNeeded() {
+        guessesNeeded++;
     }
 
+
+    public void startGame() {
+        String guess = "";
+        do{
+            guess = this.guess();
+        } while(guess != "Dead");
+
+        System.out.println("You won in " + this.guessesNeeded + " guesses!");
+    }
 
     public Ship[] getGrid() {
         return grid;
