@@ -1,36 +1,34 @@
 package exerc;
 import java.util.*;
 
-public class ExercMain {
-    public static void main(String[] args) {
-        ArrayList<String> a = new ArrayList<>();
-        a.add(0, "zero");
-        a.add(1, "one");
-        a.add(2, "two");
-        a.add(3, "three");
-        printAL(a);
+interface Nose{
+    public int iMethod();
+}
 
-        if (a.contains("three")) {
-            a.add(4, "four");
-        }
-        a.remove(2);
-        printAL(a);
-
-        if (a.contains("two")) {
-            a.add("2.2");
-        }
-        if (a.indexOf("four") != 4) {
-            a.add(4, "4.2");
-        }
-        printAL(a);
-        printAL(a);
-
+abstract class Picasso implements Nose{
+    public int iMethod(){
+        return 7;
     }
+}
 
-    public static void printAL(ArrayList<String> al) {
-        for (String element : al) {
-            System.out.print(element + " ");
+class Clowns extends Picasso{}
+
+class Acts implements Nose{
+    public int iMethod(){
+        return 5;
+    }
+}
+
+public class ExercMain extends Clowns{
+    public static void main(String[] args) {
+
+        Nose[] i = new Nose[3];
+        i[0] = new Acts();
+        i[1] = new Clowns();
+        i[2] = new ExercMain();
+
+        for(int x = 0; x < 3; x++){
+            System.out.println(i[x].iMethod() + " " + i[x].getClass());
         }
-        System.out.println();
     }
 }

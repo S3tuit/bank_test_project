@@ -2,7 +2,7 @@ package head_first;
 
 import java.util.Scanner;
 
-public class GameHelper {
+public class GameHelper{
     Scanner scan = new Scanner(System.in);
     int gridX;
     int gridY;
