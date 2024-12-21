@@ -1,5 +1,7 @@
 package head_first;
 
+import ships.Ship;
+
 public class Cell{
     private boolean alreadyGuessed;
     private Ship referencedShip;

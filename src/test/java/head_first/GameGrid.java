@@ -1,6 +1,10 @@
 package head_first;
 
 
+import ships.ShipOfFive;
+import ships.ShipOfOne;
+import ships.ShipOfThree;
+
 public class GameGrid {
 
     int gridX = 7;
@@ -28,17 +32,17 @@ public class GameGrid {
     public void createShips() {
         // create ships, and update aliveShips
         // for now, they have a fixed position
-        Ship ship_3 = new Ship(3, "Ship of 3");
+        ShipOfThree ship_3 = new ShipOfThree();
         aliveShips++;
         for (int i = 0; i < 3; i++) {
             this.grid[2][i].addShipReference(ship_3);
         }
 
-        Ship ship_1 = new Ship(1, "Ship of 1");
+        ShipOfOne ship_1 = new ShipOfOne();
         aliveShips++;
         this.grid[this.gridY-1][0].addShipReference(ship_1);
 
-        Ship ship_5 = new Ship(this.gridY, "Ship of 5");
+        ShipOfFive ship_5 = new ShipOfFive();
         aliveShips++;
         for (int idx = 0; idx < this.gridY; idx++) {
             this.grid[idx][this.gridX-1].addShipReference(ship_5);
