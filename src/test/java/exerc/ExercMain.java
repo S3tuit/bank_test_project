@@ -1,34 +1,31 @@
 package exerc;
 import java.util.*;
 
-interface Nose{
-    public int iMethod();
-}
+class Nose{
+    int val=9;
 
-abstract class Picasso implements Nose{
-    public int iMethod(){
-        return 7;
+    public Nose(){
+        System.out.println("Nose");
+    }
+
+    public void setVal(int val) {
+        this.val = val;
+    }
+
+    public int getVal() {
+        return val;
     }
 }
 
-class Clowns extends Picasso{}
-
-class Acts implements Nose{
-    public int iMethod(){
-        return 5;
+class Animal extends Nose{
+    public Animal(){
+        System.out.println("Animal");
     }
 }
 
-public class ExercMain extends Clowns{
+public class ExercMain{
     public static void main(String[] args) {
 
-        Nose[] i = new Nose[3];
-        i[0] = new Acts();
-        i[1] = new Clowns();
-        i[2] = new ExercMain();
-
-        for(int x = 0; x < 3; x++){
-            System.out.println(i[x].iMethod() + " " + i[x].getClass());
-        }
+        Animal a=new Animal();
     }
 }
